@@ -383,6 +383,471 @@ const weatherModes = [
   ["Wenn man müde ist", ["Ponta da Oliveira", "Balkon", "kleiner Einkauf", "kurzer Cafébesuch"]]
 ];
 
+let activeStopId = null;
+let preserveScroll = false;
+
+const stopInfos = [
+  {
+    id: "stop-hotel",
+    title: "Hotel Cais da Oliveira",
+    area: "Hotelnähe",
+    explanation: "Das Hotel liegt in Caniço de Baixo direkt am Meer und ist die ruhige Basis der Reise.",
+    worth: "Meerblick, Frühstück, Kitchenette und kurze Wege machen es ideal für entspannte Tage ohne ständigen Ortswechsel.",
+    time: "30-60 Min. zum Ankommen, sonst als flexible Basis",
+    parking: "Hotelparkplätze oder Parkmöglichkeiten in der Umgebung nutzen; nach Ausflügen früh genug zurückfahren.",
+    photo: "Morgens oder abends vom Balkon auf Licht, Wolken und Atlantik achten.",
+    walk: "Kurze Wege rund um die Anlage und zur Ponta da Oliveira sind gut als lockerer Spaziergang.",
+    bath: "Pool, Meerzugang oder nahe Ponta da Oliveira je nach Bedingungen.",
+    cafe: "Frühstück im Hotel, abends unkompliziert mit Kitchenette oder Restaurants in Caniço.",
+    route: "https://www.google.com/maps/search/?api=1&query=Hotel+Cais+da+Oliveira+Canico"
+  },
+  {
+    id: "stop-ponta-oliveira",
+    title: "Ponta da Oliveira",
+    area: "Hotelnähe",
+    explanation: "Küstenbereich direkt bei Caniço de Baixo mit Blick auf Felsen, Meer und die Südküste.",
+    worth: "Perfekt für kurze Meerzeit, ohne den Wagen zu bewegen.",
+    time: "30-90 Min.",
+    parking: "Am besten vom Hotel aus zu Fuß gehen.",
+    photo: "Seitliches Licht am Morgen oder Abend bringt die Felsen besonders schön heraus.",
+    walk: "Kurzer, leichter Küstenspaziergang möglich; auf Stufen und rutschige Stellen achten.",
+    bath: "Ja, bei ruhigem Meer. Badeschuhe sind sinnvoll.",
+    cafe: "Hotelbar oder kleine Stopps in Caniço de Baixo.",
+    route: "https://www.google.com/maps/search/?api=1&query=Ponta+da+Oliveira+Canico"
+  },
+  {
+    id: "stop-canico",
+    title: "Caniço",
+    area: "Hotelnähe",
+    explanation: "Caniço ist der praktische Heimatort der Reise: nah am Flughafen, nah an Funchal und trotzdem ruhig.",
+    worth: "Gute Basis für kurze Einkäufe, einfache Abendessen und Tage ohne großes Programm.",
+    time: "30-90 Min.",
+    parking: "Je nach Ziel im Ort parken; in Hotelnähe lieber zu Fuß gehen.",
+    photo: "Kleine Ortsblicke, Meerblick und Abendlicht statt großer Sehenswürdigkeiten.",
+    walk: "Leichte Wege im Ort und rund um Caniço de Baixo.",
+    bath: "Ponta da Oliveira oder Hotelbereich.",
+    cafe: "Snackbars, kleine Cafés und Restaurants in Hotelnähe.",
+    route: "https://www.google.com/maps/search/?api=1&query=Canico+Madeira"
+  },
+  {
+    id: "stop-garajau",
+    title: "Garajau",
+    area: "Hotelnähe",
+    explanation: "Garajau liegt oberhalb der Küste und verbindet Aussicht, Cristo Rei und Strandzugang.",
+    worth: "Ein kurzer Ausflug mit viel Meerblick und wenig Fahrzeit.",
+    time: "1-2 Std.",
+    parking: "Oben beim Aussichtspunkt meist einfacher als unten am Strand.",
+    photo: "Cristo Rei mit Küste und weitem Atlantik im Hintergrund.",
+    walk: "Kurze Wege am Aussichtspunkt; zum Strand ist es steiler.",
+    bath: "Praia do Garajau bei ruhigem Meer.",
+    cafe: "Snack oder Café am Strand bzw. danach in Caniço.",
+    route: "https://www.google.com/maps/search/?api=1&query=Garajau+Madeira"
+  },
+  {
+    id: "stop-cristo-rei",
+    title: "Cristo Rei",
+    area: "Hotelnähe",
+    explanation: "Die Christusstatue von Garajau steht an einem markanten Aussichtspunkt über dem Meer.",
+    worth: "Sehr nah am Hotel und trotzdem ein echter Madeira-Blick.",
+    time: "30-60 Min.",
+    parking: "Parken oben beim Aussichtspunkt.",
+    photo: "Vom Weg aus Statue, Klippen und Meer zusammen aufnehmen.",
+    walk: "Kurzer leichter Spaziergang am Aussichtspunkt, mit einigen Stufen und Kanten.",
+    bath: "Mit Praia do Garajau kombinierbar.",
+    cafe: "Danach Strandstopp oder Caniço.",
+    route: "https://www.google.com/maps/search/?api=1&query=Cristo+Rei+do+Garajau"
+  },
+  {
+    id: "stop-praia-garajau",
+    title: "Praia do Garajau",
+    area: "Hotelnähe",
+    explanation: "Kieselstrand unterhalb von Garajau im Meeresschutzgebiet.",
+    worth: "Schöner Bade- und Schnorchelstopp, wenn das Meer ruhig ist.",
+    time: "1-2 Std.",
+    parking: "Unten begrenzt; alternativ oben parken und den Zugang bewusst einplanen.",
+    photo: "Der Blick vom Strand zurück zu den Felsen ist besonders schön.",
+    walk: "Am Strand leicht, der Weg dorthin kann steil sein.",
+    bath: "Ja. Badeschuhe und Schnorchelmaske lohnen sich.",
+    cafe: "Strandbar/Snack je nach Öffnung; sonst später Caniço.",
+    route: "https://www.google.com/maps/search/?api=1&query=Praia+do+Garajau"
+  },
+  {
+    id: "stop-mercado",
+    title: "Mercado dos Lavradores",
+    area: "Funchal",
+    explanation: "Markthalle in Funchal mit Obst, Blumen, Farben und viel Stadtleben.",
+    worth: "Ein sinnlicher Start in Funchal, besonders für Madeira-Früchte und Fotomotive.",
+    time: "30-60 Min.",
+    parking: "Parkhaus in Altstadtnähe wählen und zu Fuß gehen.",
+    photo: "Obststände und Blumen aus der Nähe fotografieren, ohne den Weg zu blockieren.",
+    walk: "Leichter Stadtstopp, aber lebhaft und teils eng.",
+    cafe: "Danach Altstadt-Café oder Promenade.",
+    route: "https://www.google.com/maps/search/?api=1&query=Mercado+dos+Lavradores+Funchal"
+  },
+  {
+    id: "stop-funchal-oldtown",
+    title: "Altstadt Funchal",
+    area: "Funchal",
+    explanation: "Historische Straßen, bemalte Türen, kleine Lokale und ruhige Ecken nahe dem Markt.",
+    worth: "Ideal für Funchal ohne Pflichtprogramm: schauen, sitzen, Café trinken.",
+    time: "1-2 Std.",
+    parking: "Parkhaus nahe Mercado oder Marina.",
+    photo: "Bemalte Türen in der Rua de Santa Maria und kleine Gassen.",
+    walk: "Leicht, mit Kopfsteinpflaster und gelegentlichen Steigungen.",
+    cafe: "Viele Cafés und Restaurants in der Altstadt.",
+    route: "https://www.google.com/maps/search/?api=1&query=Funchal+Old+Town"
+  },
+  {
+    id: "stop-funchal-marina",
+    title: "Hafen/Marina Funchal",
+    area: "Funchal",
+    explanation: "Zentraler Hafenbereich mit Booten, Promenade und weitem Blick auf die Bucht.",
+    worth: "Guter ruhiger Abschluss für den Stadtspaziergang.",
+    time: "30-60 Min.",
+    parking: "Parkhäuser und Parkflächen rund um Marina und Avenida do Mar.",
+    photo: "Boote im Vordergrund, Stadt und Berge dahinter.",
+    walk: "Sehr leicht und eben entlang der Promenade.",
+    cafe: "Cafés rund um Marina und Avenida.",
+    route: "https://www.google.com/maps/search/?api=1&query=Funchal+Marina"
+  },
+  {
+    id: "stop-promenade",
+    title: "Promenade",
+    area: "Funchal",
+    explanation: "Die Promenade verbindet Stadt, Hafenblick und entspannte Pausen am Wasser.",
+    worth: "Gut, wenn man Funchal ruhig und ohne Museumsmarathon erleben möchte.",
+    time: "30-90 Min.",
+    parking: "Je nach Abschnitt Parkhaus in Funchal oder Lido nutzen.",
+    photo: "Blick über die Bucht, besonders mit Wolken über den Bergen.",
+    walk: "Leicht und weitgehend eben.",
+    bath: "Doca do Cavacas oder Barreirinha lassen sich als Badeoption ergänzen.",
+    cafe: "Viele Cafés entlang der Strecke.",
+    route: "https://www.google.com/maps/search/?api=1&query=Funchal+Promenade"
+  },
+  {
+    id: "stop-barreirinha",
+    title: "Barreirinha",
+    area: "Funchal",
+    explanation: "Kleines Meerbad am Rand der Altstadt mit Blick auf Atlantik und Stadt.",
+    worth: "Schöne leichte Bade- oder Getränkepause nach der Altstadt.",
+    time: "45-90 Min.",
+    parking: "Zu Fuß aus der Altstadt am angenehmsten; Parken in der Nähe kann knapp sein.",
+    photo: "Meerbad, Küstenlinie und Stadtlicht Richtung Abend.",
+    walk: "Kurzer Stadtweg, teils mit Steigung.",
+    bath: "Ja, wenn geöffnet und das Meer passt.",
+    cafe: "Barreirinha Bar Café ist ein naheliegender Stopp.",
+    route: "https://www.google.com/maps/search/?api=1&query=Barreirinha+Funchal"
+  },
+  {
+    id: "stop-guindaste",
+    title: "Miradouro do Guindaste",
+    area: "Nordostküste",
+    explanation: "Aussichtspunkt bei Faial mit Blick auf die raue Nordostküste.",
+    worth: "Große Küstenkulisse ohne lange Wanderung.",
+    time: "20-45 Min.",
+    parking: "Parkplätze direkt am Aussichtspunkt, bei Andrang kurz warten.",
+    photo: "Klippen und Meer im Panorama; bei klarer Sicht sehr stark.",
+    walk: "Kurzer leichter Weg am Aussichtspunkt.",
+    cafe: "Danach Santana, Faial oder Porto da Cruz.",
+    route: "https://www.google.com/maps/search/?api=1&query=Miradouro+do+Guindaste"
+  },
+  {
+    id: "stop-santana",
+    title: "Santana",
+    area: "Nordostküste",
+    explanation: "Ort im Nordosten, bekannt für die traditionellen kleinen Häuser mit Strohdächern.",
+    worth: "Klassischer Fotostopp, gut kombinierbar mit Guindaste und Porto da Cruz.",
+    time: "45-90 Min.",
+    parking: "Zentrale Parkplätze nutzen.",
+    photo: "Santana-Häuser frontal und mit Gartenfarben aufnehmen.",
+    walk: "Leichter Ortsbummel, keine Wanderung nötig.",
+    cafe: "Café oder Snack im Ort.",
+    route: "https://www.google.com/maps/search/?api=1&query=Santana+Madeira"
+  },
+  {
+    id: "stop-faial",
+    title: "Faial",
+    area: "Nordostküste",
+    explanation: "Ruhiger Küstenort zwischen Santana und Porto da Cruz mit Blick auf Berge und Meer.",
+    worth: "Guter kleiner Zwischenstopp, wenn man die Nordostküste nicht nur durchfahren möchte.",
+    time: "20-45 Min.",
+    parking: "Im Ort oder an Aussichtspunkten kurz parken.",
+    photo: "Blick Richtung Küste und grüne Hänge.",
+    walk: "Kurzer leichter Orts- oder Aussichtsstopp.",
+    cafe: "Kleiner Snackstopp möglich, sonst weiter nach Porto da Cruz.",
+    route: "https://www.google.com/maps/search/?api=1&query=Faial+Madeira"
+  },
+  {
+    id: "stop-porto-cruz",
+    title: "Porto da Cruz",
+    area: "Nordostküste",
+    explanation: "Küstenort mit entspannter Promenade, Meerblick und rauer Nordküstenstimmung.",
+    worth: "Einer der schönsten Orte, um nicht nur zu halten, sondern wirklich Pause zu machen.",
+    time: "1-2 Std.",
+    parking: "Zentrale Parkplätze im Ort nutzen.",
+    photo: "Promenade, Brandung und Penha d'Águia als Kulisse.",
+    walk: "Leichter Spaziergang am Wasser.",
+    bath: "Nur bei ruhigem Meer und passender Stelle.",
+    cafe: "Café oder Mittagspause im Ort.",
+    route: "https://www.google.com/maps/search/?api=1&query=Porto+da+Cruz+Madeira"
+  },
+  {
+    id: "stop-pico-arieiro",
+    title: "Pico do Arieiro",
+    area: "Berge und Natur",
+    explanation: "Einer der höchsten erreichbaren Punkte Madeiras, direkt mit dem Auto anfahrbar.",
+    worth: "Spektakuläre Bergblicke ohne anspruchsvolle Wanderung, wenn das Wetter mitspielt.",
+    time: "45-90 Min.",
+    parking: "Früh starten; Parkplätze können schnell voll sein.",
+    photo: "Wolken, Gipfel und Lichtwechsel; warme Jacke nicht vergessen.",
+    walk: "Nur kurze Spaziergänge am Aussichtspunkt, keine lange Gipfeltour nötig.",
+    cafe: "Café/Snack am Bereich, Öffnung vor Ort prüfen.",
+    route: "https://www.google.com/maps/search/?api=1&query=Pico+do+Arieiro"
+  },
+  {
+    id: "stop-ribeiro-frio",
+    title: "Ribeiro Frio",
+    area: "Berge und Natur",
+    explanation: "Grüner Bergort im Lorbeerwald, Ausgangspunkt für leichte Wege wie Balcões.",
+    worth: "Kühler, frischer Kontrast zur Küste und gut bei heißem Wetter.",
+    time: "45-120 Min.",
+    parking: "Begrenzte Parkplätze, am besten früher kommen.",
+    photo: "Moos, Waldwege und weiches Licht im Grün.",
+    walk: "Leichte Spaziergänge möglich; bei Regen rutschig.",
+    cafe: "Café/Restaurant im Ort möglich.",
+    route: "https://www.google.com/maps/search/?api=1&query=Ribeiro+Frio+Madeira"
+  },
+  {
+    id: "stop-balcoes",
+    title: "Levada dos Balcões",
+    area: "Berge und Natur",
+    explanation: "Kurze, fast ebene Levada ab Ribeiro Frio zu einem Aussichtspunkt.",
+    worth: "Eine der leichtesten klassischen Levada-Erfahrungen Madeiras.",
+    time: "1-1,5 Std.",
+    parking: "In Ribeiro Frio parken und den Start zu Fuß erreichen.",
+    photo: "Am Aussichtspunkt auf Wolkenlücken warten.",
+    walk: "Ca. 3 km hin und zurück, fast eben; nicht bei starkem Regen.",
+    cafe: "Vor oder nach dem Weg in Ribeiro Frio einkehren.",
+    route: "https://www.google.com/maps/search/?api=1&query=Levada+dos+Balcoes+Madeira"
+  },
+  {
+    id: "stop-fanal",
+    title: "Fanalwald",
+    area: "Berge und Natur",
+    explanation: "Alter Lorbeerwald mit moosigen Bäumen, Wiesen und oft mystischer Nebelstimmung.",
+    worth: "Besonders atmosphärisch am späten Nachmittag oder bei leichtem Nebel.",
+    time: "1-2 Std.",
+    parking: "Parkplatz am Fanal nutzen; Wetterwechsel einplanen.",
+    photo: "Einzelne knorrige Bäume mit Nebel oder weichem Seitenlicht.",
+    walk: "Leichte Spaziergänge auf Wiesen und Wegen, bei Nässe vorsichtig.",
+    cafe: "Picknick mitnehmen; Cafés eher vorher/nachher einplanen.",
+    route: "https://www.google.com/maps/search/?api=1&query=Fanal+Forest+Madeira"
+  },
+  {
+    id: "stop-paul-serra",
+    title: "Paul da Serra",
+    area: "Berge und Natur",
+    explanation: "Hochebene im Inselinneren, oft weit, windig und ganz anders als die Küste.",
+    worth: "Schöner Kontrast auf der Rückfahrt von Porto Moniz oder Seixal.",
+    time: "20-45 Min. als Stopp",
+    parking: "Nur an sicheren Haltebuchten oder Parkflächen stoppen.",
+    photo: "Weite, Wolken und Straße als ruhiges Landschaftsmotiv.",
+    walk: "Nur kurze Stopps, besonders bei Wind und Nebel vorsichtig.",
+    cafe: "Eher vorher oder nachher einplanen.",
+    route: "https://www.google.com/maps/search/?api=1&query=Paul+da+Serra+Madeira"
+  },
+  {
+    id: "stop-sao-lourenco",
+    title: "Ponta de São Lourenço",
+    area: "Osten",
+    explanation: "Karge, dramatische Ostspitze Madeiras mit weitem Blick aufs Meer.",
+    worth: "Ganz andere Landschaft als der grüne Inselkern; schon der erste Aussichtspunkt reicht.",
+    time: "45-90 Min. für die leichte Variante",
+    parking: "Früh am Parkplatz sein, besonders im Juli.",
+    photo: "Felsfarben, Meer und Windwolken; nicht nur mittags fotografieren.",
+    walk: "Nur bis zum ersten Aussichtspunkt gehen, wenn es leicht bleiben soll.",
+    bath: "Danach Machico als bequeme Badeoption.",
+    cafe: "Eis oder Café später in Machico.",
+    route: "https://www.google.com/maps/search/?api=1&query=Ponta+de+Sao+Lourenco"
+  },
+  {
+    id: "stop-machico",
+    title: "Machico",
+    area: "Osten",
+    explanation: "Küstenstadt mit bequemem Strand, Promenade und guter Infrastruktur.",
+    worth: "Ideal nach São Lourenço: Baden, Eis, Café und kein komplizierter Zugang.",
+    time: "1-3 Std.",
+    parking: "Parkplätze nahe Strand und Promenade suchen.",
+    photo: "Strand mit Bergen und Bucht im Hintergrund.",
+    walk: "Leichte Promenade, gut für einen ruhigen Ausklang.",
+    bath: "Ja, eine der bequemsten Badeoptionen.",
+    cafe: "Cafés und Eisdielen nahe Strand.",
+    route: "https://www.google.com/maps/search/?api=1&query=Machico+Madeira"
+  },
+  {
+    id: "stop-ribeira-brava",
+    title: "Ribeira Brava",
+    area: "Westen und Nordküste",
+    explanation: "Küstenort an der Südküste, gut als erster Stopp vor der Nordküstenrunde.",
+    worth: "Kurze Pause, Kaffee und ein ruhiger Start in einen langen Fahrtag.",
+    time: "20-45 Min.",
+    parking: "Parkplätze im Ort oder nahe Promenade.",
+    photo: "Promenade, Kirche und Talöffnung.",
+    walk: "Leichter kurzer Ortsgang.",
+    cafe: "Café oder Snack vor der Weiterfahrt.",
+    route: "https://www.google.com/maps/search/?api=1&query=Ribeira+Brava+Madeira"
+  },
+  {
+    id: "stop-sao-vicente",
+    title: "São Vicente",
+    area: "Westen und Nordküste",
+    explanation: "Ort an der Nordküste mit Bergen, Meer und ruhigerer Atmosphäre.",
+    worth: "Schöner Zwischenstopp auf dem Weg zu Véu da Noiva, Seixal oder Porto Moniz.",
+    time: "30-60 Min.",
+    parking: "Im Ort oder an der Küste parken.",
+    photo: "Berge hinter dem Ort und Nordküstenbrandung.",
+    walk: "Leichter Spaziergang im Ort oder an der Küste.",
+    cafe: "Café im Ort oder später Seixal/Porto Moniz.",
+    route: "https://www.google.com/maps/search/?api=1&query=Sao+Vicente+Madeira"
+  },
+  {
+    id: "stop-veu-noiva",
+    title: "Véu da Noiva",
+    area: "Westen und Nordküste",
+    explanation: "Bekannter Wasserfallblick an der Nordküste, dessen Name an einen Brautschleier erinnert.",
+    worth: "Kurzer Fotostopp mit typischer Madeira-Küstenkulisse.",
+    time: "10-25 Min.",
+    parking: "Nur sicher und ausgeschildert halten; Verkehr beachten.",
+    photo: "Wasserfall, alte Küstenstraße und Meer zusammen rahmen.",
+    walk: "Kein Spaziergang nötig, eher Aussichtspunkt.",
+    cafe: "Weiter nach Seixal oder Porto Moniz.",
+    route: "https://www.google.com/maps/search/?api=1&query=Veu+da+Noiva+Madeira"
+  },
+  {
+    id: "stop-seixal",
+    title: "Seixal",
+    area: "Westen und Nordküste",
+    explanation: "Kleiner Ort an der Nordküste, bekannt für schwarzen Sandstrand, grüne Bergkulisse und wilde Atlantikküste.",
+    worth: "Einer der schönsten Badestopps der Insel und ideal, um wirklich Pause zu machen.",
+    time: "1-2 Std.",
+    parking: "Parkplätze im Ort und in Strandnähe, je nach Saison begrenzt.",
+    photo: "Der Blick vom Strand auf die grüne Steilküste ist besonders schön.",
+    walk: "Kurzer Spaziergang am Strand oder entlang der Küste möglich.",
+    bath: "Ja, bei ruhigem Meer sehr schön. Badeschuhe oder Wasserschuhe sind sinnvoll.",
+    cafe: "Kleiner Café- oder Snackstopp im Ort möglich.",
+    route: "https://www.google.com/maps/search/?api=1&query=Seixal+Madeira+beach"
+  },
+  {
+    id: "stop-porto-moniz",
+    title: "Porto Moniz",
+    area: "Westen und Nordküste",
+    explanation: "Ort im Nordwesten mit bekannten Naturschwimmbecken aus Lavagestein.",
+    worth: "Gute Mischung aus Baden, Mittagspause und beeindruckender Küstenlandschaft.",
+    time: "1,5-3 Std.",
+    parking: "Größere Parkbereiche im Ort, im Juli früh entspannter.",
+    photo: "Lavapools mit Brandung und Felsen im Hintergrund.",
+    walk: "Leichter Spaziergang entlang der Becken und Promenade.",
+    bath: "Ja. Badeschuhe rund um Lavagestein sinnvoll.",
+    cafe: "Cachalote oder andere Lokale in Laufnähe.",
+    route: "https://www.google.com/maps/search/?api=1&query=Porto+Moniz+natural+swimming+pools"
+  },
+  {
+    id: "stop-cabo-girao",
+    title: "Cabo Girão",
+    area: "Südwesten",
+    explanation: "Hoher Aussichtspunkt mit Glasplattform über der Südküste.",
+    worth: "Kurzer, eindrucksvoller Stopp mit weitem Blick und wenig Laufaufwand.",
+    time: "30-60 Min.",
+    parking: "Besucherparkplatz am Skywalk nutzen.",
+    photo: "Glasplattform, Küste und Funchal-Richtung; bei Andrang Geduld.",
+    walk: "Sehr kurzer leichter Stopp.",
+    cafe: "Danach Câmara de Lobos für Café oder Mittagessen.",
+    route: "https://www.google.com/maps/search/?api=1&query=Cabo+Girao"
+  },
+  {
+    id: "stop-camara-lobos",
+    title: "Câmara de Lobos",
+    area: "Südwesten",
+    explanation: "Fischerort mit Hafen, bunten Booten und gemütlicher Promenade.",
+    worth: "Entspannter Ort für Mittagessen, Café und Hafenstimmung.",
+    time: "1-2 Std.",
+    parking: "Zentrale Parkplätze oder Parkhaus nutzen.",
+    photo: "Bunte Boote im Hafen mit Häusern am Hang.",
+    walk: "Leichter Spaziergang am Hafen.",
+    cafe: "Vila do Peixe, Hafencafés oder Poncha-Stopp.",
+    route: "https://www.google.com/maps/search/?api=1&query=Camara+de+Lobos"
+  },
+  {
+    id: "stop-eira-serrado",
+    title: "Eira do Serrado",
+    area: "Nonnental",
+    explanation: "Aussichtspunkt hoch über Curral das Freiras mit Blick in das Nonnental.",
+    worth: "Großer Bergblick ohne lange Wanderung.",
+    time: "30-60 Min.",
+    parking: "Parkplatz am Aussichtspunkt/Hotelbereich nutzen.",
+    photo: "Talblick mit Bergen, besonders bei klaren Wolkenlücken.",
+    walk: "Kurzer Weg zum Aussichtspunkt, teils Stufen.",
+    cafe: "Café am Aussichtspunkt möglich.",
+    route: "https://www.google.com/maps/search/?api=1&query=Eira+do+Serrado"
+  },
+  {
+    id: "stop-curral",
+    title: "Curral das Freiras",
+    area: "Nonnental",
+    explanation: "Dorf im tief eingeschnittenen Nonnental, bekannt für Kastanienprodukte.",
+    worth: "Ruhiger Ort für Kastanienkuchen und eine andere Seite Madeiras.",
+    time: "45-90 Min.",
+    parking: "Im Ort ausgeschilderte Parkmöglichkeiten nutzen.",
+    photo: "Dorf, Talwände und kleine Details im Ort.",
+    walk: "Leichter Ortsbummel.",
+    cafe: "Kastanienkuchen probieren, z. B. bei einem Café im Ort.",
+    route: "https://www.google.com/maps/search/?api=1&query=Curral+das+Freiras"
+  },
+  {
+    id: "stop-fatima",
+    title: "Capela de Nossa Senhora de Fátima",
+    area: "Geheimtipps",
+    explanation: "Kleine Kapelle oberhalb von São Vicente mit schöner Aussicht auf Tal und Küste.",
+    worth: "Ruhiger, kurzer Zusatzstopp abseits der großen Programmpunkte.",
+    time: "20-40 Min.",
+    parking: "Nur an geeigneten Stellen kurz und rücksichtsvoll parken.",
+    photo: "Kapelle mit Tal, Bergen oder Meer im Hintergrund.",
+    walk: "Kurzer leichter Stopp, je nach Zugang mit kleinen Steigungen.",
+    cafe: "Danach São Vicente oder Seixal.",
+    route: "https://www.google.com/maps/search/?api=1&query=Capela+de+Nossa+Senhora+de+Fatima+Sao+Vicente+Madeira"
+  },
+  {
+    id: "stop-ponta-pargo",
+    title: "Ponta do Pargo",
+    area: "Geheimtipps",
+    explanation: "Westlicher Küstenbereich mit Leuchtturmstimmung und weitem Atlantikblick.",
+    worth: "Besonders schön zum Sonnenuntergang, wenn der Tag nicht schon zu lang ist.",
+    time: "45-90 Min.",
+    parking: "Bei Aussichtspunkten und Leuchtturm nur ausgewiesene Flächen nutzen.",
+    photo: "Sonnenuntergang, Leuchtturm und Atlantik weit aufnehmen.",
+    walk: "Kurze leichte Wege an Aussichtspunkten, auf Wind achten.",
+    cafe: "Vorher oder nachher in einem Ort einplanen.",
+    route: "https://www.google.com/maps/search/?api=1&query=Ponta+do+Pargo+Madeira"
+  }
+];
+
+const dayStops = {
+  1: ["stop-hotel", "stop-canico", "stop-ponta-oliveira"],
+  2: ["stop-hotel", "stop-canico", "stop-ponta-oliveira"],
+  3: ["stop-mercado", "stop-funchal-oldtown", "stop-funchal-marina", "stop-promenade", "stop-barreirinha"],
+  4: ["stop-garajau", "stop-cristo-rei", "stop-praia-garajau"],
+  5: ["stop-guindaste", "stop-santana", "stop-faial", "stop-porto-cruz"],
+  6: ["stop-pico-arieiro", "stop-ribeiro-frio"],
+  7: ["stop-hotel", "stop-ponta-oliveira", "stop-canico"],
+  8: ["stop-sao-lourenco", "stop-machico"],
+  9: ["stop-cabo-girao", "stop-camara-lobos"],
+  10: ["stop-ribeira-brava", "stop-sao-vicente", "stop-veu-noiva", "stop-seixal", "stop-porto-moniz", "stop-paul-serra"],
+  11: ["stop-fanal", "stop-porto-moniz"],
+  12: ["stop-ribeiro-frio", "stop-balcoes", "stop-santana"],
+  13: ["stop-eira-serrado", "stop-curral"],
+  14: ["stop-ponta-oliveira", "stop-machico", "stop-ponta-pargo", "stop-fatima"]
+};
+
 function icon(name) {
   const icons = {
     home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/>',
@@ -427,6 +892,10 @@ function checkState() {
   return readJson(STORAGE_KEYS.checklist, {});
 }
 
+function stopMap() {
+  return Object.fromEntries(stopInfos.map((stop) => [stop.id, stop]));
+}
+
 function itemRegistry() {
   const registry = {};
   days.forEach((day) => {
@@ -458,6 +927,16 @@ function itemRegistry() {
   secrets.forEach(([id, title, description, route]) => {
     registry[id] = { id, type: "Geheimtipp", title, subtitle: description, route, anchor: "#secrets" };
   });
+  stopInfos.forEach((stop) => {
+    registry[stop.id] = {
+      id: stop.id,
+      type: stop.area,
+      title: stop.title,
+      subtitle: stop.worth,
+      route: stop.route,
+      anchor: "#days"
+    };
+  });
   return registry;
 }
 
@@ -487,6 +966,71 @@ function mapsButton(url, label = "Route öffnen") {
 function favoriteButton(id) {
   const active = Boolean(favoriteMap()[id]);
   return `<button class="btn js-fav ${active ? "is-active" : ""}" type="button" data-id="${id}">${icon("heart")}<span>${active ? "Favorit" : "Favorit"}</span></button>`;
+}
+
+function stopButtons(dayNumber) {
+  const stops = stopMap();
+  const stopIds = dayStops[dayNumber] || [];
+  if (!stopIds.length) return "";
+
+  return `
+    <section class="stop-strip" aria-label="Stopps mit Infofenstern">
+      <div class="stop-strip-head">
+        <strong>Stopps</strong>
+        <span>kurze Infos für unterwegs</span>
+      </div>
+      <div class="stop-buttons">
+        ${stopIds.map((id) => {
+          const stop = stops[id];
+          if (!stop) return "";
+          return `
+            <button class="stop-button js-stop" type="button" data-stop="${id}">
+              <span>${stop.title}</span>
+              <small>Mehr erfahren</small>
+            </button>
+          `;
+        }).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderStopModal() {
+  if (!activeStopId) return "";
+  const stop = stopMap()[activeStopId];
+  if (!stop) return "";
+  const rows = [
+    ["Kurze Erklärung", stop.explanation],
+    ["Warum lohnt es sich?", stop.worth],
+    ["Zeit", stop.time],
+    ["Parken", stop.parking],
+    ["Fototipp", stop.photo],
+    ["Leichter Spaziergang", stop.walk],
+    ["Baden", stop.bath],
+    ["Café/Restaurant", stop.cafe]
+  ].filter(([, value]) => Boolean(value));
+
+  return `
+    <div class="modal-backdrop js-modal-close" role="presentation">
+      <section class="stop-modal" role="dialog" aria-modal="true" aria-labelledby="stop-modal-title">
+        <button class="modal-close js-modal-close" type="button" aria-label="Infofenster schließen">×</button>
+        <div class="meta-row"><span class="meta">${stop.area}</span></div>
+        <h2 id="stop-modal-title">${stop.title}</h2>
+        <div class="modal-details">
+          ${rows.map(([label, value]) => `
+            <div class="modal-detail">
+              <strong>${label}</strong>
+              <span>${value}</span>
+            </div>
+          `).join("")}
+        </div>
+        <div class="action-row">
+          ${mapsButton(stop.route)}
+          ${favoriteButton(stop.id)}
+        </div>
+      </section>
+    </div>
+  `;
 }
 
 function pageChrome(view, content) {
@@ -566,6 +1110,7 @@ function renderDays() {
         <div class="detail"><strong>Restaurant oder Selbstversorgung</strong><span>${day.food}</span></div>
         <div class="detail"><strong>Schlechtwetter oder Nebel</strong><span>${day.weather}</span></div>
       </div>
+      ${stopButtons(day.day)}
       <div class="action-row">
         ${mapsButton(day.maps, "Google Maps")}
         <button class="btn turquoise js-done" type="button" data-day="${day.day}">${icon("check")}<span>${done.has(day.day) ? "Erledigt" : "Als erledigt markieren"}</span></button>
@@ -744,11 +1289,22 @@ function render() {
     shopping: () => renderChecklist("shopping", shoppingSections, "shopping"),
     favorites: renderFavorites
   };
-  app.innerHTML = (views[view] || renderHome)();
-  window.scrollTo({ top: 0, behavior: "instant" });
+  app.innerHTML = (views[view] || renderHome)() + renderStopModal();
+  if (!preserveScroll && !activeStopId) {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+  preserveScroll = false;
 }
 
 document.addEventListener("click", (event) => {
+  const stop = event.target.closest(".js-stop");
+  if (stop) {
+    activeStopId = stop.dataset.stop;
+    preserveScroll = true;
+    render();
+    return;
+  }
+
   const favorite = event.target.closest(".js-fav");
   if (favorite) {
     toggleFavorite(favorite.dataset.id);
@@ -771,6 +1327,20 @@ document.addEventListener("click", (event) => {
       location.hash = "#home";
     }
   }
+
+  const closeModal = event.target.classList.contains("modal-backdrop") || event.target.closest(".modal-close");
+  if (closeModal) {
+    activeStopId = null;
+    preserveScroll = true;
+    render();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape" || !activeStopId) return;
+  activeStopId = null;
+  preserveScroll = true;
+  render();
 });
 
 document.addEventListener("change", (event) => {
