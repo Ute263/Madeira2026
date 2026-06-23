@@ -1,0 +1,26 @@
+{
+  "name": "Madeira 2026",
+  "short_name": "Madeira",
+  "description": "Persoenlicher Madeira-Reisefuehrer fuer 14 entspannte Tage zu zweit.",
+  "lang": "de",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8f1e7",
+  "theme_color": "#06324a",
+  "icons": [
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
