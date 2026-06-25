@@ -389,6 +389,66 @@ p {
   padding-left: 18px;
 }
 
+.image-frame {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(23, 168, 166, 0.96), rgba(6, 50, 74, 0.94) 62%, rgba(243, 223, 195, 0.88));
+  color: var(--white);
+  isolation: isolate;
+}
+
+.image-frame::after {
+  content: attr(data-title);
+  position: absolute;
+  inset: auto 12px 12px 12px;
+  z-index: 2;
+  display: none;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.image-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: none;
+  background:
+    linear-gradient(0deg, rgba(6, 50, 74, 0.62), rgba(6, 50, 74, 0.04) 58%),
+    radial-gradient(circle at 78% 18%, rgba(255, 255, 255, 0.22), transparent 28%);
+}
+
+.image-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-frame.card-image,
+.image-frame.hero-image {
+  aspect-ratio: 16 / 9;
+}
+
+.image-frame.hero-image {
+  min-height: 210px;
+}
+
+.image-frame.mini {
+  aspect-ratio: 4 / 3;
+  min-height: 82px;
+}
+
+.image-frame.image-missing::before,
+.image-frame.image-missing::after {
+  display: block;
+}
+
 .stop-strip {
   display: grid;
   gap: 10px;
@@ -423,7 +483,8 @@ p {
 .stop-button {
   min-height: 64px;
   display: grid;
-  gap: 4px;
+  grid-template-rows: auto auto auto;
+  gap: 6px;
   align-content: center;
   padding: 12px;
   border: 1px solid var(--line);

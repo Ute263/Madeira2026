@@ -384,6 +384,7 @@ const weatherModes = [
 ];
 
 let activeStopId = null;
+let activeInfoId = null;
 let preserveScroll = false;
 
 const stopInfos = [
@@ -848,6 +849,111 @@ const dayStops = {
   14: ["stop-ponta-oliveira", "stop-machico", "stop-ponta-pargo", "stop-fatima"]
 };
 
+const imageOverrides = {
+  "day-1": "hotel-cais-da-oliveira.jpg",
+  "day-2": "canico.jpg",
+  "day-3": "funchal-altstadt.jpg",
+  "day-4": "cristo-rei.jpg",
+  "day-5": "santana.jpg",
+  "day-6": "pico-do-arieiro.jpg",
+  "day-7": "ponta-da-oliveira.jpg",
+  "day-8": "machico.jpg",
+  "day-11": "fanalwald.jpg",
+  "day-12": "levada-dos-balcoes.jpg",
+  "stop-hotel": "hotel-cais-da-oliveira.jpg",
+  "stop-ponta-oliveira": "ponta-da-oliveira.jpg",
+  "stop-canico": "canico.jpg",
+  "stop-garajau": "praia-do-garajau.jpg",
+  "stop-cristo-rei": "cristo-rei.jpg",
+  "stop-praia-garajau": "praia-do-garajau.jpg",
+  "stop-mercado": "mercado-dos-lavradores.jpg",
+  "stop-funchal-oldtown": "funchal-altstadt.jpg",
+  "stop-funchal-marina": "funchal-marina.jpg",
+  "stop-promenade": "funchal-promenade.jpg",
+  "stop-barreirinha": "barreirinha.jpg",
+  "stop-guindaste": "miradouro-do-guindaste.jpg",
+  "stop-santana": "santana.jpg",
+  "stop-faial": "faial.jpg",
+  "stop-porto-cruz": "porto-da-cruz.jpg",
+  "stop-pico-arieiro": "pico-do-arieiro.jpg",
+  "stop-ribeiro-frio": "ribeiro-frio.jpg",
+  "stop-balcoes": "levada-dos-balcoes.jpg",
+  "stop-fanal": "fanalwald.jpg",
+  "stop-paul-serra": "paul-da-serra.jpg",
+  "stop-sao-lourenco": "ponta-de-sao-lourenco.jpg",
+  "stop-machico": "machico.jpg",
+  "stop-ribeira-brava": "ribeira-brava.jpg",
+  "stop-sao-vicente": "sao-vicente.jpg",
+  "stop-veu-noiva": "veu-da-noiva.jpg",
+  "stop-seixal": "seixal.jpg",
+  "stop-porto-moniz": "porto-moniz.jpg",
+  "stop-cabo-girao": "cabo-girao.jpg",
+  "stop-camara-lobos": "camara-de-lobos.jpg",
+  "stop-eira-serrado": "eira-do-serrado.jpg",
+  "stop-curral": "curral-das-freiras.jpg",
+  "stop-fatima": "capela-nossa-senhora-fatima.jpg",
+  "stop-ponta-pargo": "ponta-do-pargo.jpg",
+  "swim-seixal": "seixal.jpg",
+  "swim-porto-moniz": "porto-moniz.jpg",
+  "swim-machico": "machico.jpg",
+  "swim-ponta-oliveira": "ponta-da-oliveira.jpg",
+  "swim-garajau": "praia-do-garajau.jpg",
+  "swim-cavacas": "doca-do-cavacas.jpg",
+  "whale-garajau": "praia-do-garajau.jpg",
+  "whale-lourenco": "ponta-de-sao-lourenco.jpg",
+  "whale-guindaste": "miradouro-do-guindaste.jpg",
+  "whale-pargo": "ponta-do-pargo.jpg",
+  "whale-balcony": "hotel-cais-da-oliveira.jpg",
+  "market-pingo-cancela": "pingo-doce-super-cancela.jpg",
+  "market-continente-agua": "continente-agua-de-pena.jpg",
+  "market-continente-canico": "continente-canico.jpg",
+  "market-spar": "spar-canico.jpg",
+  "market-sabores": "sabores-da-ilha.jpg",
+  "market-mercearia": "mercearia-jose-da-costa.jpg",
+  "rest-traineira": "a-traineira.jpg",
+  "rest-rede": "a-rede.jpg",
+  "rest-mare": "snack-bar-mare.jpg",
+  "rest-terraca": "la-terraca.jpg",
+  "rest-ti-laura": "ti-laura.jpg",
+  "rest-laranjinha": "laranjinha.jpg",
+  "rest-polar": "o-polar.jpg",
+  "rest-casco": "o-casco.jpg",
+  "rest-vila-peixe": "vila-do-peixe.jpg",
+  "rest-cachalote": "cachalote.jpg",
+  "rest-curral": "sabores-do-curral.jpg",
+  "rest-akua": "akua.jpg",
+  "rest-armazem": "armazem-do-sal.jpg",
+  "secret-porto-cruz": "porto-da-cruz.jpg",
+  "secret-fatima": "capela-nossa-senhora-fatima.jpg",
+  "secret-seixal": "seixal.jpg",
+  "secret-pargo": "ponta-do-pargo.jpg",
+  "secret-fanal": "fanalwald.jpg",
+  "secret-balcony": "balcony-bolo-do-caco.jpg"
+};
+
+const availableImages = new Set([
+  "barreirinha.jpg",
+  "canico.jpg",
+  "cristo-rei.jpg",
+  "faial.jpg",
+  "fanalwald.jpg",
+  "funchal-altstadt.jpg",
+  "funchal-marina.jpg",
+  "funchal-promenade.jpg",
+  "hotel-cais-da-oliveira.jpg",
+  "levada-dos-balcoes.jpg",
+  "machico.jpg",
+  "mercado-dos-lavradores.jpg",
+  "miradouro-do-guindaste.jpg",
+  "paul-da-serra.jpg",
+  "pico-do-arieiro.jpg",
+  "ponta-da-oliveira.jpg",
+  "ponta-de-sao-lourenco.jpg",
+  "porto-da-cruz.jpg",
+  "praia-do-garajau.jpg",
+  "santana.jpg"
+]);
+
 function icon(name) {
   const icons = {
     home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/>',
@@ -892,6 +998,28 @@ function checkState() {
   return readJson(STORAGE_KEYS.checklist, {});
 }
 
+function imageFileFor(id, title) {
+  if (imageOverrides[id]) return imageOverrides[id];
+  if (id?.startsWith("day-")) return null;
+  return `${String(title || "madeira-tip")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/&/g, "und")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")}.jpg`;
+}
+
+function imageFrame(id, title, mode = "thumb") {
+  const file = imageFileFor(id, title);
+  if (!file || !availableImages.has(file)) return "";
+  return `
+    <figure class="image-frame ${mode}" data-title="${title}">
+      <img src="./images/${file}" alt="${title}" loading="lazy" onerror="this.closest('.image-frame').remove();">
+    </figure>
+  `;
+}
+
 function stopMap() {
   return Object.fromEntries(stopInfos.map((stop) => [stop.id, stop]));
 }
@@ -905,7 +1033,8 @@ function itemRegistry() {
       title: `Tag ${day.day}: ${day.title}`,
       subtitle: day.description,
       route: day.maps,
-      anchor: `#days`
+      anchor: `#days`,
+      image: imageFileFor(day.id, day.title)
     };
   });
   swimSpots.forEach((spot) => {
@@ -915,17 +1044,21 @@ function itemRegistry() {
       title: spot.title,
       subtitle: spot.description,
       route: spot.route,
-      anchor: "#swim"
+      anchor: "#swim",
+      image: imageFileFor(spot.id, spot.title)
     };
   });
   whaleSpots.forEach(([id, title, description, route]) => {
-    registry[id] = { id, type: "Wale & Delfine", title, subtitle: description, route, anchor: "#whales" };
+    registry[id] = { id, type: "Wale & Delfine", title, subtitle: description, route, anchor: "#whales", image: imageFileFor(id, title) };
+  });
+  markets.forEach(([id, title, distance, use, detail, route]) => {
+    registry[id] = { id, type: "Supermarkt", title, subtitle: `${use} ${detail}`, route, anchor: "#markets", image: imageFileFor(id, title) };
   });
   restaurants.forEach(([id, title, group, price, kitchen, dayFit, reservation, route]) => {
-    registry[id] = { id, type: group, title, subtitle: `${kitchen} · ${dayFit} · Reservierung: ${reservation}`, route, anchor: "#restaurants" };
+    registry[id] = { id, type: group, title, subtitle: `${kitchen} · ${dayFit} · Reservierung: ${reservation}`, route, anchor: "#restaurants", image: imageFileFor(id, title) };
   });
   secrets.forEach(([id, title, description, route]) => {
-    registry[id] = { id, type: "Geheimtipp", title, subtitle: description, route, anchor: "#secrets" };
+    registry[id] = { id, type: "Geheimtipp", title, subtitle: description, route, anchor: "#secrets", image: imageFileFor(id, title) };
   });
   stopInfos.forEach((stop) => {
     registry[stop.id] = {
@@ -934,7 +1067,8 @@ function itemRegistry() {
       title: stop.title,
       subtitle: stop.worth,
       route: stop.route,
-      anchor: "#days"
+      anchor: "#days",
+      image: imageFileFor(stop.id, stop.title)
     };
   });
   return registry;
@@ -968,6 +1102,10 @@ function favoriteButton(id) {
   return `<button class="btn js-fav ${active ? "is-active" : ""}" type="button" data-id="${id}">${icon("heart")}<span>${active ? "Favorit" : "Favorit"}</span></button>`;
 }
 
+function moreButton(id) {
+  return `<button class="btn js-info" type="button" data-info="${id}">${icon("spark")}<span>Mehr erfahren</span></button>`;
+}
+
 function stopButtons(dayNumber) {
   const stops = stopMap();
   const stopIds = dayStops[dayNumber] || [];
@@ -985,6 +1123,7 @@ function stopButtons(dayNumber) {
           if (!stop) return "";
           return `
             <button class="stop-button js-stop" type="button" data-stop="${id}">
+              ${imageFrame(id, stop.title, "mini")}
               <span>${stop.title}</span>
               <small>Mehr erfahren</small>
             </button>
@@ -1014,6 +1153,7 @@ function renderStopModal() {
     <div class="modal-backdrop js-modal-close" role="presentation">
       <section class="stop-modal" role="dialog" aria-modal="true" aria-labelledby="stop-modal-title">
         <button class="modal-close js-modal-close" type="button" aria-label="Infofenster schließen">×</button>
+        ${imageFrame(stop.id, stop.title, "hero-image")}
         <div class="meta-row"><span class="meta">${stop.area}</span></div>
         <h2 id="stop-modal-title">${stop.title}</h2>
         <div class="modal-details">
@@ -1027,6 +1167,108 @@ function renderStopModal() {
         <div class="action-row">
           ${mapsButton(stop.route)}
           ${favoriteButton(stop.id)}
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function infoRowsFor(id) {
+  const day = days.find((item) => item.id === id);
+  if (day) {
+    return [
+      ["Kurz erklärt", day.description],
+      ["Route", day.route],
+      ["Zeit", day.drive],
+      ["Highlights", day.highlights.join(", ")],
+      ["Parken", day.parking],
+      ["Baden", day.swim],
+      ["Essen", day.food],
+      ["Alternative", day.weather]
+    ];
+  }
+
+  const swim = swimSpots.find((item) => item.id === id);
+  if (swim) {
+    return [
+      ["Kurz erklärt", swim.description],
+      ["Geeignet für", swim.suitable],
+      ["Badeschuhe", swim.shoes],
+      ["Parken", swim.parking],
+      ["WC/Duschen", swim.facilities],
+      ["Café/Restaurant", swim.cafe]
+    ];
+  }
+
+  const restaurant = restaurants.find((item) => item[0] === id);
+  if (restaurant) {
+    return [
+      ["Küche", restaurant[4]],
+      ["Preisniveau", restaurant[3]],
+      ["Passend für", restaurant[5]],
+      ["Reservierung", restaurant[6]],
+      ["Tipp", "Gut als bewusster Essensstopp einplanen, damit der Tag entspannt bleibt."]
+    ];
+  }
+
+  const market = markets.find((item) => item[0] === id);
+  if (market) {
+    return [
+      ["Entfernung grob", market[2]],
+      ["Geeignet für", market[3]],
+      ["Besonderheit", market[4]],
+      ["Tipp", "Einkauf möglichst mit einer Fahrt verbinden und Getränke früh in die Kitchenette stellen."]
+    ];
+  }
+
+  const whale = whaleSpots.find((item) => item[0] === id);
+  if (whale) {
+    return [
+      ["Kurz erklärt", whale[2]],
+      ["Warum lohnt es sich?", "Ein ruhiger Aussichtspunkt, um das Meer bewusst zu beobachten."],
+      ["Zeit", "20-60 Min."],
+      ["Tipp", "Fernglas mitnehmen. Delfine sind möglich, Wale mit Glück."]
+    ];
+  }
+
+  const secret = secrets.find((item) => item[0] === id);
+  if (secret) {
+    return [
+      ["Kurz erklärt", secret[2]],
+      ["Warum lohnt es sich?", "Passt gut zu einer Reise ohne Hektik und mit kleinen persönlichen Pausen."],
+      ["Zeit", "30-90 Min., je nach Stimmung"],
+      ["Tipp", "Nur einplanen, wenn der Tag dadurch ruhiger statt voller wird."]
+    ];
+  }
+
+  return [];
+}
+
+function renderInfoModal() {
+  if (!activeInfoId) return "";
+  const item = itemRegistry()[activeInfoId];
+  if (!item) return "";
+  const rows = infoRowsFor(activeInfoId).filter(([, value]) => Boolean(value));
+
+  return `
+    <div class="modal-backdrop js-modal-close" role="presentation">
+      <section class="stop-modal" role="dialog" aria-modal="true" aria-labelledby="info-modal-title">
+        <button class="modal-close js-modal-close" type="button" aria-label="Infofenster schließen">×</button>
+        ${imageFrame(item.id, item.title, "hero-image")}
+        <div class="meta-row"><span class="meta">${item.type}</span></div>
+        <h2 id="info-modal-title">${item.title}</h2>
+        <p>${item.subtitle}</p>
+        <div class="modal-details">
+          ${rows.map(([label, value]) => `
+            <div class="modal-detail">
+              <strong>${label}</strong>
+              <span>${value}</span>
+            </div>
+          `).join("")}
+        </div>
+        <div class="action-row">
+          ${item.route ? mapsButton(item.route) : ""}
+          ${favoriteButton(item.id)}
         </div>
       </section>
     </div>
@@ -1094,6 +1336,7 @@ function renderDays() {
   const done = new Set(doneDays());
   const cards = days.map((day) => `
     <article class="day-card" id="${day.id}">
+      ${imageFrame(day.id, day.title, "card-image")}
       <div class="meta-row">
         <span class="meta">Tag ${day.day}</span>
         <span class="meta">${day.intensity}</span>
@@ -1112,6 +1355,7 @@ function renderDays() {
       </div>
       ${stopButtons(day.day)}
       <div class="action-row">
+        ${moreButton(day.id)}
         ${mapsButton(day.maps, "Google Maps")}
         <button class="btn turquoise js-done" type="button" data-day="${day.day}">${icon("check")}<span>${done.has(day.day) ? "Erledigt" : "Als erledigt markieren"}</span></button>
         ${favoriteButton(day.id)}
@@ -1125,10 +1369,11 @@ function renderDays() {
 function renderMaps() {
   const cards = days.map((day) => `
     <article class="card">
+      ${imageFrame(day.id, day.title, "card-image")}
       <div class="meta-row"><span class="meta">Tag ${day.day}</span><span class="meta">${day.intensity}</span></div>
       <h3>${day.title}</h3>
       <p>${day.route}</p>
-      <div class="action-row">${mapsButton(day.maps, "Route öffnen")}</div>
+      <div class="action-row">${moreButton(day.id)}${mapsButton(day.maps, "Route öffnen")}</div>
     </article>
   `).join("");
   return pageChrome("maps", `<div class="card-grid">${cards}</div>`);
@@ -1137,6 +1382,7 @@ function renderMaps() {
 function renderSwim() {
   const cards = swimSpots.map((spot) => `
     <article class="card">
+      ${imageFrame(spot.id, spot.title, "card-image")}
       <h2>${spot.title}</h2>
       <p>${spot.description}</p>
       <div class="details">
@@ -1146,7 +1392,7 @@ function renderSwim() {
         <div class="detail"><strong>WC/Duschen</strong><span>${spot.facilities}</span></div>
         <div class="detail"><strong>Restaurant/Café</strong><span>${spot.cafe}</span></div>
       </div>
-      <div class="action-row">${mapsButton(spot.route)}${favoriteButton(spot.id)}</div>
+      <div class="action-row">${moreButton(spot.id)}${mapsButton(spot.route)}${favoriteButton(spot.id)}</div>
     </article>
   `).join("");
   return pageChrome("swim", `<div class="card-grid">${cards}</div>`);
@@ -1155,9 +1401,10 @@ function renderSwim() {
 function renderWhales() {
   const cards = whaleSpots.map(([id, title, description, route]) => `
     <article class="card">
+      ${imageFrame(id, title, "card-image")}
       <h2>${title}</h2>
       <p>${description}</p>
-      <div class="action-row">${mapsButton(route)}${favoriteButton(id)}</div>
+      <div class="action-row">${moreButton(id)}${mapsButton(route)}${favoriteButton(id)}</div>
     </article>
   `).join("");
   return pageChrome("whales", `
@@ -1169,13 +1416,14 @@ function renderWhales() {
 function renderMarkets() {
   const cards = markets.map(([id, title, distance, use, detail, route]) => `
     <article class="card">
+      ${imageFrame(id, title, "card-image")}
       <h2>${title}</h2>
       <div class="details">
         <div class="detail"><strong>Entfernung grob</strong><span>${distance}</span></div>
         <div class="detail"><strong>Geeignet für</strong><span>${use}</span></div>
         <div class="detail"><strong>Besonderheit</strong><span>${detail}</span></div>
       </div>
-      <div class="action-row">${mapsButton(route)}</div>
+      <div class="action-row">${moreButton(id)}${mapsButton(route)}</div>
     </article>
   `).join("");
   return pageChrome("markets", `<div class="card-grid">${cards}</div>`);
@@ -1189,6 +1437,7 @@ function renderRestaurants() {
       <div class="card-grid" style="margin-top:14px">
         ${restaurants.filter((restaurant) => restaurant[2] === group || (group === "Besonderer Abend" && restaurant[2] === "Besonderer Abend")).map(([id, title, category, price, kitchen, dayFit, reservation, route]) => `
           <article class="card">
+            ${imageFrame(id, title, "card-image")}
             <div class="meta-row"><span class="meta">${price}</span><span class="meta">${category}</span></div>
             <h3>${title}</h3>
             <div class="details">
@@ -1196,7 +1445,7 @@ function renderRestaurants() {
               <div class="detail"><strong>Passend für</strong><span>${dayFit}</span></div>
               <div class="detail"><strong>Reservierung</strong><span>${reservation}</span></div>
             </div>
-            <div class="action-row">${mapsButton(route)}${favoriteButton(id)}</div>
+            <div class="action-row">${moreButton(id)}${mapsButton(route)}${favoriteButton(id)}</div>
           </article>
         `).join("")}
       </div>
@@ -1208,9 +1457,10 @@ function renderRestaurants() {
 function renderSecrets() {
   const cards = secrets.map(([id, title, description, route]) => `
     <article class="card">
+      ${imageFrame(id, title, "card-image")}
       <h2>${title}</h2>
       <p>${description}</p>
-      <div class="action-row">${mapsButton(route)}${favoriteButton(id)}</div>
+      <div class="action-row">${moreButton(id)}${mapsButton(route)}${favoriteButton(id)}</div>
     </article>
   `).join("");
   return pageChrome("secrets", `<div class="card-grid">${cards}</div>`);
@@ -1260,10 +1510,12 @@ function renderFavorites() {
   }
   const cards = favorites.map((item) => `
     <article class="card">
+      ${imageFrame(item.id, item.title, "card-image")}
       <div class="meta-row"><span class="meta">${item.type}</span></div>
       <h2>${item.title}</h2>
       <p>${item.subtitle}</p>
       <div class="action-row">
+        ${moreButton(item.id)}
         ${item.route ? mapsButton(item.route) : ""}
         <a class="btn" href="${item.anchor}">${icon("home")}<span>Bereich öffnen</span></a>
         ${favoriteButton(item.id)}
@@ -1289,8 +1541,8 @@ function render() {
     shopping: () => renderChecklist("shopping", shoppingSections, "shopping"),
     favorites: renderFavorites
   };
-  app.innerHTML = (views[view] || renderHome)() + renderStopModal();
-  if (!preserveScroll && !activeStopId) {
+  app.innerHTML = (views[view] || renderHome)() + renderStopModal() + renderInfoModal();
+  if (!preserveScroll && !activeStopId && !activeInfoId) {
     window.scrollTo({ top: 0, behavior: "instant" });
   }
   preserveScroll = false;
@@ -1300,6 +1552,21 @@ document.addEventListener("click", (event) => {
   const stop = event.target.closest(".js-stop");
   if (stop) {
     activeStopId = stop.dataset.stop;
+    activeInfoId = null;
+    preserveScroll = true;
+    render();
+    return;
+  }
+
+  const info = event.target.closest(".js-info");
+  if (info) {
+    if (info.dataset.info.startsWith("stop-")) {
+      activeStopId = info.dataset.info;
+      activeInfoId = null;
+    } else {
+      activeInfoId = info.dataset.info;
+      activeStopId = null;
+    }
     preserveScroll = true;
     render();
     return;
@@ -1331,14 +1598,16 @@ document.addEventListener("click", (event) => {
   const closeModal = event.target.classList.contains("modal-backdrop") || event.target.closest(".modal-close");
   if (closeModal) {
     activeStopId = null;
+    activeInfoId = null;
     preserveScroll = true;
     render();
   }
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key !== "Escape" || !activeStopId) return;
+  if (event.key !== "Escape" || (!activeStopId && !activeInfoId)) return;
   activeStopId = null;
+  activeInfoId = null;
   preserveScroll = true;
   render();
 });

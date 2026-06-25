@@ -1,4 +1,27 @@
-const CACHE_NAME = "madeira-2026-v2";
+const CACHE_NAME = "madeira-2026-v4";
+const IMAGE_ASSETS = [
+  "./images/barreirinha.jpg",
+  "./images/canico.jpg",
+  "./images/cristo-rei.jpg",
+  "./images/faial.jpg",
+  "./images/fanalwald.jpg",
+  "./images/funchal-altstadt.jpg",
+  "./images/funchal-marina.jpg",
+  "./images/funchal-promenade.jpg",
+  "./images/hotel-cais-da-oliveira.jpg",
+  "./images/levada-dos-balcoes.jpg",
+  "./images/machico.jpg",
+  "./images/mercado-dos-lavradores.jpg",
+  "./images/miradouro-do-guindaste.jpg",
+  "./images/paul-da-serra.jpg",
+  "./images/pico-do-arieiro.jpg",
+  "./images/ponta-da-oliveira.jpg",
+  "./images/ponta-de-sao-lourenco.jpg",
+  "./images/porto-da-cruz.jpg",
+  "./images/praia-do-garajau.jpg",
+  "./images/santana.jpg",
+  "./images/credits.json"
+];
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -8,7 +31,8 @@ const APP_SHELL = [
   "./assets/madeira-coast.png",
   "./assets/icon-192.png",
   "./assets/icon-512.png",
-  "./assets/apple-touch-icon.png"
+  "./assets/apple-touch-icon.png",
+  ...IMAGE_ASSETS
 ];
 
 self.addEventListener("install", (event) => {
