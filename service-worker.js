@@ -1,4 +1,4 @@
-const CACHE_NAME = "madeira-2026-v5";
+const CACHE_NAME = "madeira-2026-v6";
 const IMAGE_ASSETS = [
   "./images/barreirinha.jpg",
   "./images/canico.jpg",
@@ -25,9 +25,10 @@ const IMAGE_ASSETS = [
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=20260721-4",
-  "./app.js?v=20260721-4",
-  "./enhancements.js?v=20260721-4",
+  "./styles.css?v=20260721-5",
+  "./app.js?v=20260721-5",
+  "./enhancements.js?v=20260721-5",
+  "./link-fixes.js?v=20260721-5",
   "./manifest.json",
   "./assets/madeira-coast.png",
   "./assets/icon-192.png",
@@ -52,10 +53,8 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
-
   const requestUrl = new URL(event.request.url);
   const isAppCode = event.request.mode === "navigate" || /\.(?:html|js|css)$/.test(requestUrl.pathname);
-
   if (isAppCode) {
     event.respondWith(
       fetch(event.request)
@@ -68,7 +67,6 @@ self.addEventListener("fetch", (event) => {
     );
     return;
   }
-
   event.respondWith(
     caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
       const copy = response.clone();
