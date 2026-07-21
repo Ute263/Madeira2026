@@ -1,4 +1,4 @@
-const CACHE_NAME = "madeira-2026-v4";
+const CACHE_NAME = "madeira-2026-v5";
 const IMAGE_ASSETS = [
   "./images/barreirinha.jpg",
   "./images/canico.jpg",
@@ -25,8 +25,9 @@ const IMAGE_ASSETS = [
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css",
-  "./app.js",
+  "./styles.css?v=20260721-4",
+  "./app.js?v=20260721-4",
+  "./enhancements.js?v=20260721-4",
   "./manifest.json",
   "./assets/madeira-coast.png",
   "./assets/icon-192.png",
@@ -36,9 +37,7 @@ const APP_SHELL = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
   self.skipWaiting();
 });
 
@@ -54,22 +53,27 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
+  const requestUrl = new URL(event.request.url);
+  const isAppCode = event.request.mode === "navigate" || /\.(?:html|js|css)$/.test(requestUrl.pathname);
 
-      return fetch(event.request)
+  if (isAppCode) {
+    event.respondWith(
+      fetch(event.request)
         .then((response) => {
           const copy = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
           return response;
         })
-        .catch(() => {
-          if (event.request.mode === "navigate") {
-            return caches.match("./index.html");
-          }
-          return undefined;
-        });
-    })
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html")))
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+      return response;
+    }))
   );
 });
